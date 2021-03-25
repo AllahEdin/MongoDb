@@ -1,0 +1,32 @@
+version: "3.4"
+
+services:
+  serviceweb:
+    hostname: "launcher-logservice-serviceweb-lx-{{.Node.Hostname}}"
+    image: "192.168.3.214:8624/isu_dev/samsmu.revi.simplelogservice.serviceweb:latestdev-linux"
+    command: "--ServiceDiscovery:Port=13680 --HttpEndpoint=http://192.168.6.139:8500"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - target: 80
+        published: 10100
+    volumes:
+      - /usr/share/fs:/FileStorage
+    networks:
+      - launcher_net
+    secrets:
+      - TravelDbConnectionString
+      - JWTKey
+      - GoogleSecret
+secrets:
+   TravelDbConnectionString:
+      file: /usr/app/dev/TravelDbConnectionString
+   JWTKey:
+      file: /usr/app/dev/JWTKey
+   GoogleSecret:
+      file: /usr/app/dev/GoogleSecret
+
+networks:
+  launcher_net:
+    external:
+      name: dev_launcher_net

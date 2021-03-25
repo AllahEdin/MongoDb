@@ -1,0 +1,58 @@
+version: "3.7"
+services:
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+    networks:
+      - launcher_net
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    depends_on:
+      - mongo
+    networks:
+      - launcher_net
+
+  serviceweb:
+    hostname: "launcher-logservice-serviceweb-lx-{{.Node.Hostname}}"
+    image: "192.168.3.214:8624/isu_dev/samsmu.revi.simplelogservice.serviceweb:latestdev-linux"
+    command: "--ServiceDiscovery:Port=13680 --HttpEndpoint=http://192.168.6.139:8500"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - target: 80
+        published: 10100
+    volumes:
+      - /usr/share/fs:/FileStorage
+      - /usr/share/fs/db:/data/db
+    networks:
+      - launcher_net
+    depends_on:
+      - mongo
+    secrets:
+      - TravelDbConnectionString
+      - JWTKey
+      - GoogleSecret
+      
+secrets:
+   TravelDbConnectionString:
+      file: /usr/app/dev/TravelDbConnectionString
+   JWTKey:
+      file: /usr/app/dev/JWTKey
+   GoogleSecret:
+      file: /usr/app/dev/GoogleSecret
+
+networks:
+  launcher_net:
+    external:
+      name: dev_launcher_net

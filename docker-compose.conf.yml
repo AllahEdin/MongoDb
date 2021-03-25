@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+
+  configsvr:
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs --port 27017 --dbpath /data/db
+    ports:
+      - 40001:27017
+    volumes:
+      - ./db:/data/db
+    networks:
+      - launcher_net
+
+
+networks:
+  launcher_net:
+    external:
+      name: dev_launcher_net
+
+

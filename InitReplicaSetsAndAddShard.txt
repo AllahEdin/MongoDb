@@ -1,0 +1,39 @@
+Инициализация репл. сета для конфигсервера
+в контейнере с mongo 
+rs.initiate({_id: "cfgrs",configsvr: true,members: [{ _id : 0, host : "<ip>:<port>" }]})
+
+rs.initiate({_id: "cfgrs",configsvr: true,members: [{ _id : 0, host : "192.168.6.44:40001" }]})
+
+Инициализация репл. сета для шарда
+в контейнере с mongo 
+rs.initiate({_id: "shard<No>rs",members: [{ _id : 0, host : "<ip>:<port>" }]})
+
+rs.initiate({_id: "shard1rs",members: [{ _id : 0, host : "192.168.6.44:50001" }]})
+rs.initiate({_id: "shard2rs",members: [{ _id : 0, host : "192.168.6.45:50002" }]})
+
+Добавление шардов в mongos
+в контейнере с mongos
+sh.addShard("shard<No>rs/<ip>:<port>")
+
+sh.addShard("shard1rs/192.168.6.44:50001")
+sh.addShard("shard2rs/192.168.6.45:50002")
+
+
+use <my_db_name>
+db.createColection("<my_collection_name>")
+
+Активация шардирования
+sh.enableSharding("<my_db_name>")
+
+sh.enableSharding("sharddemo")
+
+Включить шардирование для коллекции
+sh.shardCollection("<my_db_name>.<my_collection_name>", {"<my_field_name>":"<type>"})
+
+sh.shardCollection("sharddemo.movies2", {"title":"hashed"})
+
+use <my_db_name>
+db.<my_collection_name>.getShardDistribution()
+
+use sharddemo
+db.movies2.getShardDistribution()
